@@ -134,6 +134,15 @@
   footer { background:#00356a; color:var(--light); font-size:13px; padding:26px 0; }
   footer .wrap { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
 
+
+  /* ---------- hero motion: shapes swell and lean towards the pointer ---------- */
+  .hero .dshape { animation:glide 1.6s cubic-bezier(.2,.7,.2,1) forwards, swell 14s 1.6s ease-in-out infinite; }
+  .hero .dshape, .hero .ring { transition:translate .9s cubic-bezier(.2,.7,.2,1); }
+  .hero .dshape { translate:calc(var(--mx,0) * -140px) calc(var(--my,0) * -110px); }
+  .hero .ring { translate:calc(var(--mx,0) * 260px) calc(var(--my,0) * 200px); }
+  @keyframes swell { 0%,100% { scale:1; } 50% { scale:1.12; } }
+  @media (prefers-reduced-motion: reduce) { .hero .dshape, .hero .ring { translate:none; transition:none; } .hero .dshape, .cue::after { animation-iteration-count:1 !important; } }
+
   /* keyframes */
   @keyframes fade { to { opacity:1; } }
   @keyframes rise { to { transform:translateY(0); } }
@@ -349,6 +358,14 @@ document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 const bar = document.querySelector(".progress");
 function prog() { const h = document.documentElement; const max = h.scrollHeight - h.clientHeight; bar.style.width = (max>0 ? h.scrollTop/max*100 : 0) + "%"; }
 addEventListener("scroll", prog, { passive:true }); prog(); route();
+// hero shapes lean towards the pointer (skipped when reduced motion is set)
+const heroEl = document.querySelector(".hero");
+if (heroEl && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  heroEl.addEventListener("pointermove", e => { const r = heroEl.getBoundingClientRect();
+    heroEl.style.setProperty("--mx", ((e.clientX - r.left) / r.width - .5).toFixed(3));
+    heroEl.style.setProperty("--my", ((e.clientY - r.top) / r.height - .5).toFixed(3)); });
+  heroEl.addEventListener("pointerleave", () => { heroEl.style.setProperty("--mx", 0); heroEl.style.setProperty("--my", 0); });
+}
 </script>
 </body>
 </html>
